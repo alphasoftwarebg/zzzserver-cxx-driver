@@ -6,7 +6,7 @@ C driver for **ZZZ Base** through ZZZ Server
 ***main.cpp*** - sample access to **ZZZ Base** through function "zzzclient_zzzprogram"  
 
 **sample usage:**
-```c
+```cpp
 ZZZClient client;
 
 cout << client.ZZZProgram("localhost", 3333, "#[cout;Hello World from ZZZServer!]") << endl;
