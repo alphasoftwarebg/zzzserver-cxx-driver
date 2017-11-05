@@ -1,4 +1,4 @@
-# zzzserver-c-driver
+# zzzserver-cxx-driver
 C driver for **ZZZ Base** through ZZZ Server
 
 ***ZZZClient.h*** - the header file with driver functions declarations  
