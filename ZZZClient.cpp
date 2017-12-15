@@ -44,7 +44,7 @@ void ZZZClient::UninitSocket()
 
 ZZZClient::ZZZClient()
 {
-    this->sock = -1;
+	this->sock = -1;
 
 	InitSocket();
 }
@@ -57,105 +57,101 @@ ZZZClient::~ZZZClient()
 }
 
 /**
-    Connect to a host on a certain port number
-*/
+ * Connect to a host on a certain port number
+ */
 BOOL ZZZClient::Connect(string address , int port)
 {
-    // create socket if it is not already created
-    if(sock == -1)
-    {
-        //Create socket
-        sock = (int)socket(AF_INET , SOCK_STREAM , 0);
-        if (sock == -1)
-        {
-            // Could not create socket
-        }
+	// create socket if it is not already created
+	if(sock == -1)
+	{
+		//Create socket
+		sock = (int)socket(AF_INET , SOCK_STREAM , 0);
+		if (sock == -1)
+		{
+			// Could not create socket
+		}
+		// Socket created
+	}
+	else {   /* OK , nothing */  }
 
-        // Socket created
-    }
-    else    {   /* OK , nothing */  }
+	// setup address structure
+	if((int)inet_addr(address.c_str()) == -1)
+	{
+		struct hostent *he;
+		struct in_addr **addr_list;
 
-    // setup address structure
-    if((int)inet_addr(address.c_str()) == -1)
-    {
-        struct hostent *he;
-        struct in_addr **addr_list;
+		// resolve the hostname, its not an ip address
+		if((he = gethostbyname(address.c_str())) == NULL)
+		{
+			// Failed to resolve hostname
 
-        // resolve the hostname, its not an ip address
-        if ( (he = gethostbyname( address.c_str() ) ) == NULL)
-        {
-            // Failed to resolve hostname
+			return FALSE;
+		}
+		// Cast the h_addr_list to in_addr , since h_addr_list also has the ip address in long format only
+		addr_list = (struct in_addr **) he->h_addr_list;
 
-            return FALSE;
-        }
+		server.sin_addr = *addr_list[0];
+	}
+	else // plain ip address
+	{
+		server.sin_addr.s_addr = inet_addr( address.c_str() );
+	}
 
-        // Cast the h_addr_list to in_addr , since h_addr_list also has the ip address in long format only
-        addr_list = (struct in_addr **) he->h_addr_list;
+	server.sin_family = AF_INET;
+	server.sin_port = htons( port );
 
-        server.sin_addr = *addr_list[0];
-    }
-    // plain ip address
-    else
-    {
-        server.sin_addr.s_addr = inet_addr( address.c_str() );
-    }
-
-    server.sin_family = AF_INET;
-    server.sin_port = htons( port );
-
-    // Connect to remote server
-    if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
-    {
-        // Error: Connect failed.
-        return 1;
-    }
+	// Connect to remote server
+	if (connect(sock , (struct sockaddr *)&server , sizeof(server)) < 0)
+	{
+		// Error: Connect failed.
+		return 1;
+	}
 
 #ifndef _WIN32
-    {
+	{
 		int sockFlags;
 		sockFlags = fcntl(sock, F_GETFL, 0);
 		sockFlags |= O_NONBLOCK;
 		fcntl(sock, F_SETFL, sockFlags);
-    }
+	}
 #endif
 
-    // Connected
-    return TRUE;
+	// Connected
+	return TRUE;
 }
 
 /**
-    Send data to the connected host
+ * Send data to the connected host
 */
 BOOL ZZZClient::Send(string data)
 {
-    // Send some data
-    if( send(sock , data.c_str() , (int)strlen(data.c_str())+1 , 0) < 0)
-    {
-        // Send failed
-        return FALSE;
-    }
-    // Data "data" send;
+	// Send some data
+	if( send(sock , data.c_str() , (int)strlen(data.c_str())+1 , 0) < 0)
+	{
+		// Send failed
+		return FALSE;
+	}
+	// Data "data" send;
 
-    return TRUE;
+	return TRUE;
 }
 
 /**
-    Receive data from the connected host
-*/
+ * Receive data from the connected host
+ */
 string ZZZClient::Receive()
 {
 	char buffer[512];
-    string reply = "";
+	string reply = "";
 
-    // Receive a reply from the server
+	// Receive a reply from the server
 	int len = 0;
-    while((len = (int)recv(sock , buffer , sizeof(buffer) , 0)) > 0)
-    {
+	while((len = (int)recv(sock , buffer , sizeof(buffer) , 0)) > 0)
+	{
 		buffer[len] = '\0';
-	    reply += buffer;
-    }
-
-    return reply;
+		reply += buffer;
+	}
+	return reply;
 }
 
 void ZZZClient::Close()
