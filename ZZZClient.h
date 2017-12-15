@@ -52,18 +52,18 @@ using namespace std;
 class ZZZClient
 {
 private:
-    int sock;
-    struct sockaddr_in server;
+	int sock;
+	struct sockaddr_in server;
 	int InitSocket();
 	void UninitSocket();
 
 public:
-    ZZZClient();
+	ZZZClient();
 	virtual ~ZZZClient();
-    BOOL Connect(string, int);
+	BOOL Connect(string, int);
 	void Close();
-    BOOL Send(string data);
-    string Receive();
+	BOOL Send(string data);
+	string Receive();
 	string ZZZProgram(string host, int port, string data);
 };
 
